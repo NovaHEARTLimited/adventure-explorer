@@ -1,1 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adventure Explorer™ — Jungle Quest Homework System</title>
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --jungle-dark: #1B4332;
+    --jungle-mid: #2D6A4F;
+    --jungle-bright: #40916C;
+    --jungle-light: #74C69D;
+    --jungle-pale: #D8F3DC;
+    --jungle-cream: #F0FFF4;
+    --earth-brown: #6B4226;
+    --earth-mid: #9C6B3C;
+    --earth-light: #F5E6D3;
+    --earth-pale: #FDF6EE;
+    --sun-gold: #E9C46A;
+    --sun-light: #FFF8E1;
+    --river-blue: #219EBC;
+    --river-light: #E0F4FA;
+    --volcano-red: #E63946;
+    --volcano-light: #FDECEA;
+    --sky-purple: #7B2D8B;
+    --sky-light: #F5E6FF;
+    --sand-yellow: #F4A261;
+    --sand-light: #FFF3E8;
+    --white: #FFFFFF;
+    --soft: #6B7280;
+    --dark: #111827;
+  }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--jungle-dark);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .nav {
+    background: var(--jungle-dark);
+    border-bottom: 3px solid var(--jungle-light);
+    padding: 11px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 20px rgba(0,0,0,0.4);
+  }
+  .nav-logo { font-size: 22px; }
+  .nav-title {
+    font-family: 'Righteous', cursive;
+    font-size: 17px;
+    color: var(--sun-gold);
+    letter-spacing: 1px;
+    margin-right: 6px;
+  }
+  .nav-btn {
+    background: rgba(116,198,157,0.1);
+    border: 1.5px solid rgba(116,198,157,0.3);
+    color: var(--jungle-light);
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { background: rgba(116,198,157,0.2); }
+  .nav-btn.active { background: var(--sun-gold); color: var(--jungle-dark); border-color: var(--sun-gold); }
+  .print-btn {
+    margin-left: auto;
+    background: var(--volcano-red);
+    border: none;
+    color: white;
+    font-family: 'Righteous', cursive;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+
+  /* PAGE */
+  .page-wrap { display: none; max-width: 940px; margin: 0 auto; padding: 28px 20px 60px; }
+  .page-wrap.active { display: block; }
+
+  /* SHEET */
+  .sheet {
+    background: var(--white);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 0 3px var(--jungle-light), 0 10px 40px rgba(0,0,0,0.4);
+    margin-bottom: 28px;
+    color: var(--dark);
+  }
+
+  /* HEADER */
+  .sheet-header { padding: 22px 32px 18px; position: relative; overflow: hidden; }
+  .header-tag {
+    font-size: 9px; font-weight: 900; letter-spacing: 2.5px;
+    text-transform: uppercase; margin-bottom: 5px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .header-title {
+    font-family: 'Righteous', cursive;
+    font-size: 30px; line-height: 1.1; letter-spacing: 0.5px;
+  }
+  .header-sub { font-size: 13px; font-weight: 600; margin-top: 4px; opacity: 0.75; }
+  .header-icon { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); font-size: 72px; opacity: 0.9; }
+  .leaf-deco {
+    position: absolute; font-size: 60px; opacity: 0.05; pointer-events: none;
+  }
+  .sheet-body { padding: 24px 32px; }
+
+  /* CUT */
+  .cut-hint {
+    text-align: center; font-size: 10px; color: var(--soft);
+    font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px; justify-content: center;
+  }
+  .cut-line { flex: 1; border-top: 2px dashed #C8E6D0; }
+
+  /* FIELD */
+  .fl { font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--soft); margin-bottom: 3px; }
+  .fv { border-bottom: 2px solid; height: 28px; }
+
+  /* TERRITORY MAP */
+  .territory-map {
+    background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 40%, #1B4332 100%);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--jungle-light);
+  }
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    position: relative;
+    z-index: 2;
+  }
+  .territory {
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 2.5px solid;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .territory.locked {
+    filter: grayscale(1) brightness(0.4);
+    opacity: 0.35;
+    border-style: dashed;
+  }
+  .territory.unlocked {
+    box-shadow: 0 0 16px rgba(233,196,106,0.5);
+  }
+  .territory-icon { font-size: 34px; margin-bottom: 6px; display: block; }
+  .territory-name { font-family: 'Righteous', cursive; font-size: 13px; line-height: 1.2; }
+  .territory-pts { font-size: 9px; font-weight: 800; margin-top: 3px; opacity: 0.8; letter-spacing: 1px; }
+  .map-title {
+    font-family: 'Righteous', cursive;
+    font-size: 14px;
+    color: var(--sun-gold);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+    position: relative;
+  }
+
+  /* TASK ROWS */
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 2px solid;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .task-cb {
+    width: 26px; height: 26px;
+    border: 3px solid currentColor;
+    border-radius: 7px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: white;
+  }
+  .task-cb.done { background: currentColor; }
+  .task-icon { font-size: 26px; }
+  .task-body { flex: 1; }
+  .task-name { font-family: 'Righteous', cursive; font-size: 16px; }
+  .task-sub { font-size: 11px; font-weight: 600; opacity: 0.65; margin-top: 1px; }
+  .task-maps { display: flex; gap: 4px; }
+  .map-piece { font-size: 14px; opacity: 0.2; }
+  .map-piece.earned { opacity: 1; }
+
+  /* EXPLORER BADGE */
+  .exp-badge {
+    width: 255px;
+    background: linear-gradient(145deg, var(--jungle-dark), var(--jungle-mid));
+    border-radius: 18px;
+    padding: 20px 17px;
+    color: white;
+    border: 3px solid var(--sun-gold);
+    position: relative;
+    overflow: hidden;
+  }
+  .badge-vines {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(233,196,106,0.08), transparent 60%);
+    pointer-events: none;
+  }
+  .badge-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; border-bottom: 1px solid rgba(233,196,106,0.3); padding-bottom: 12px; }
+  .badge-logo { font-size: 26px; }
+  .badge-org { font-family: 'Righteous', cursive; font-size: 13px; color: var(--sun-gold); line-height: 1.3; }
+  .badge-photo { width: 68px; height: 68px; border-radius: 50%; border: 2px dashed rgba(233,196,106,0.4); display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255,255,255,0.35); text-align: center; margin: 0 auto 14px; }
+  .badge-field { margin-bottom: 9px; }
+  .badge-fl { font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--sun-gold); margin-bottom: 2px; opacity: 0.85; }
+  .badge-fv { border-bottom: 1px solid rgba(255,255,255,0.2); height: 20px; }
+  .badge-rank { margin-top: 12px; background: var(--sun-gold); border-radius: 8px; padding: 8px 10px; }
+  .badge-rl { font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--jungle-dark); opacity: 0.7; }
+  .badge-rv { font-family: 'Righteous', cursive; font-size: 14px; color: var(--jungle-dark); }
+
+  /* MAP PIECE TOKENS */
+  .mp-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .mp-token {
+    border: 2px dashed #C8E6D0; border-radius: 12px; aspect-ratio: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer; transition: all 0.2s; background: var(--jungle-cream);
+  }
+  .mp-token:hover { border-color: var(--sun-gold); background: var(--sun-light); }
+  .mp-token.earned { background: var(--sun-light); border-color: var(--sun-gold); border-style: solid; }
+  .mp-token .mt-icon { font-size: 24px; }
+  .mp-token .mt-label { font-size: 8px; font-weight: 800; color: var(--soft); letter-spacing: 0.5px; text-align: center; line-height: 1.3; }
+
+  /* SUBJECT TERRITORY CARDS */
+  .subj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .subj-card { border-radius: 16px; padding: 18px 16px; border: 3px solid; }
+  .subj-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .subj-icon { font-size: 30px; }
+  .subj-title { font-family: 'Righteous', cursive; font-size: 19px; }
+  .subj-tag { font-size: 10px; font-weight: 800; opacity: 0.65; letter-spacing: 1px; text-transform: uppercase; }
+  .subj-task { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8); margin-bottom: 8px; }
+  .subj-cb { width: 20px; height: 20px; border: 2.5px solid currentColor; border-radius: 5px; flex-shrink: 0; }
+  .subj-text { flex: 1; font-size: 12px; font-weight: 700; }
+  .subj-piece { font-size: 13px; opacity: 0.45; }
+
+  /* NATURE BREAKS */
+  .nature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .nature-card { border-radius: 16px; padding: 18px 14px; border: 2.5px solid; text-align: center; }
+  .nc-icon { font-size: 38px; margin-bottom: 8px; display: block; }
+  .nc-title { font-family: 'Righteous', cursive; font-size: 15px; margin-bottom: 6px; }
+  .nc-desc { font-size: 11px; font-weight: 600; opacity: 0.7; line-height: 1.5; }
+
+  /* RANK */
+  .rank-row { display: flex; align-items: center; gap: 16px; padding: 15px 18px; border-radius: 12px; margin-bottom: 8px; border: 2.5px solid; }
+  .rank-icon { font-size: 36px; }
+  .rank-level { font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; opacity: 0.55; margin-bottom: 2px; }
+  .rank-name { font-family: 'Righteous', cursive; font-size: 20px; }
+  .rank-desc { font-size: 11px; font-weight: 600; opacity: 0.7; margin-top: 2px; }
+  .rank-req { margin-left: auto; font-size: 11px; font-weight: 700; text-align: right; opacity: 0.65; }
+  .rank-conn { height: 14px; margin-left: 38px; border-left: 3px dashed #C8E6D0; }
+
+  /* SCRIPT */
+  .scr-row { display: grid; grid-template-columns: 1fr 36px 1fr; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .scr-box { border-radius: 12px; padding: 12px 14px; border: 2px solid; }
+  .scr-tag { font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+  .scr-text { font-size: 12px; font-weight: 700; line-height: 1.4; font-style: italic; }
+  .scr-arrow { text-align: center; font-size: 20px; }
+
+  /* CERT */
+  .cert { border: 5px double var(--sun-gold); border-radius: 18px; padding: 36px 44px; text-align: center; background: linear-gradient(135deg, var(--jungle-cream) 0%, white 50%, var(--jungle-cream) 100%); position: relative; margin-bottom: 20px; }
+  .cert-corner { position: absolute; font-size: 28px; opacity: 0.3; }
+  .cert-badge { font-size: 54px; margin-bottom: 10px; }
+  .cert-org { font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--jungle-mid); margin-bottom: 6px; }
+  .cert-title { font-family: 'Righteous', cursive; font-size: 32px; color: var(--dark); margin-bottom: 8px; }
+  .cert-sub { font-size: 13px; color: var(--soft); margin-bottom: 16px; }
+  .cert-name-line { border-bottom: 2px solid var(--jungle-mid); width: 280px; margin: 0 auto 6px; height: 36px; }
+  .cert-name-label { font-size: 9px; font-weight: 800; color: var(--soft); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+  .cert-reason { font-size: 14px; font-weight: 700; color: var(--soft); font-style: italic; margin-bottom: 20px; }
+  .cert-footer { display: flex; justify-content: space-around; margin-top: 20px; }
+  .cert-sig-line { border-bottom: 1.5px solid #C8E6D0; width: 120px; margin-bottom: 5px; height: 28px; }
+  .cert-sig-label { font-size: 9px; font-weight: 700; color: var(--soft); letter-spacing: 1.5px; text-transform: uppercase; }
+
+  /* WEEKLY */
+  .wk-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .wk-col { border: 2px solid var(--jungle-mid); border-radius: 12px; overflow: hidden; }
+  .wk-head { background: var(--jungle-dark); color: var(--sun-gold); text-align: center; padding: 10px 4px; font-family: 'Righteous', cursive; font-size: 15px; }
+  .wk-body { padding: 10px 8px; background: white; }
+  .wk-slot { border-bottom: 1px dashed #C8E6D0; height: 26px; display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .wk-cb { width: 12px; height: 12px; border: 1.5px solid #C8E6D0; border-radius: 3px; flex-shrink: 0; }
+  .wk-sub { font-size: 9px; color: var(--soft); font-weight: 700; }
+  .wk-pieces { padding: 8px; text-align: center; border-top: 2px solid #C8E6D0; font-size: 15px; background: var(--jungle-cream); }
+
+  @media print {
+    body { background: white; }
+    .nav { display: none; }
+    .page-wrap { display: block !important; padding: 0; max-width: 100%; }
+    .sheet { box-shadow: none; border-radius: 0; page-break-after: always; margin-bottom: 0; }
+    .territory-map { background: #2D6A4F !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-logo">🌿</div>
+  <div class="nav-title">Adventure Explorer™</div>
+  <button class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+  <button class="nav-btn" onclick="showPage('badge')">Explorer Badge</button>
+  <button class="nav-btn" onclick="showPage('map')">Territory Map</button>
+  <button class="nav-btn" onclick="showPage('tokens')">Map Pieces</button>
+  <button class="nav-btn" onclick="showPage('subjects')">Subject Territories</button>
+  <button class="nav-btn" onclick="showPage('breaks')">Nature Breaks</button>
+  <button class="nav-btn" onclick="showPage('ranks')">Explorer Ranks</button>
+  <button class="nav-btn" onclick="showPage('scripts')">Guide Scripts</button>
+  <button class="nav-btn" onclick="showPage('weekly')">Weekly Journal</button>
+  <button class="nav-btn" onclick="showPage('cert')">Certificates</button>
+  <button class="nav-btn" onclick="showPage('guide')">Guide Leader Brief</button>
+  <button class="print-btn" onclick="window.print()">🖨️ Print</button>
+</div>
+
+<!-- ======================== -->
+<!-- DASHBOARD                -->
+<!-- ======================== -->
+<div class="page-wrap active" id="page-dashboard">
+<div class="sheet">
+  <div class="sheet-header" style="background:linear-gradient(135deg,var(--jungle-dark),var(--jungle-mid));">
+    <div class="leaf-deco" style="top:-10px;right:180px;">🌿</div>
+    <div class="leaf-deco" style="bottom:-20px;left:30%;">🍃</div>
+    <div class="header-tag" style="color:var(--sun-gold);">🌍 New Territory Discovered!</div>
+    <div class="header-title" style="color:white;">Adventure Explorer™<br><span style="color:var(--sun-gold);">Jungle Quest HQ</span></div>
+    <div class="header-sub" style="color:rgba(255,255,255,0.65);">Homework Hero System · Today's Expedition Briefing</div>
+    <div class="header-icon">🗺️</div>
+  </div>
+  <div class="sheet-body">
+
+    <!-- Explorer info -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
+      <div><div class="fl" style="color:var(--jungle-mid);">Explorer Name</div><div class="fv" style="color:var(--jungle-mid);border-color:var(--jungle-mid);opacity:0.4;"></div></div>
+      <div><div class="fl" style="color:var(--jungle-mid);">Today's Date</div><div class="fv" style="color:var(--jungle-mid);border-color:var(--jungle-mid);opacity:0.4;"></div></div>
+      <div><div class="fl" style="color:var(--jungle-mid);">Explorer Rank</div><div class="fv" style="color:var(--jungle-mid);border-color:var(--jungle-mid);opacity:0.4;"></div></div>
+      <div><div class="fl" style="color:var(--jungle-mid);">Today's Territory</div><div class="fv" style="color:var(--jungle-mid);border-color:var(--jungle-mid);opacity:0.4;"></div></div>
+    </div>
+
+    <!-- Welcome bonus -->
+    <div style="background:var(--sun-light);border:2.5px solid var(--sun-gold);border-radius:14px;padding:14px 18px;margin-bottom:20px;display:flex;gap:14px;align-items:center;">
+      <span style="font-size:30px;">🎁</span>
+      <div>
+        <div style="font-family:'Righteous',cursive;font-size:15px;color:var(--earth-brown);">Welcome Bonus — Your Expedition Has Already Begun!</div>
+        <div style="font-size:12px;font-weight:700;color:var(--earth-mid);margin-top:3px;">Explorers earn 2 FREE Map Pieces just for opening the expedition journal and writing their name above. Claim them now — the jungle is waiting! 🌿</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <!-- Today's tasks -->
+      <div>
+        <div style="font-family:'Righteous',cursive;font-size:17px;color:var(--jungle-dark);margin-bottom:12px;">📋 Today's Expedition Tasks</div>
+        <div class="task-row" style="background:var(--river-light);border-color:#7EC8E3;color:#0E6688;" onclick="toggleTask(this)">
+          <div class="task-cb" style="color:var(--river-blue);"></div>
+          <div class="task-icon">📖</div>
+          <div class="task-body"><div class="task-name">Reading River</div><div class="task-sub">Navigate the story for 10 mins</div></div>
+          <div class="task-maps"><span class="map-piece">🗺️</span><span class="map-piece">🗺️</span></div>
+        </div>
+        <div class="task-row" style="background:var(--sun-light);border-color:#F5D073;color:#7A4F10;" onclick="toggleTask(this)">
+          <div class="task-cb" style="color:var(--sun-gold);"></div>
+          <div class="task-icon">🔢</div>
+          <div class="task-body"><div class="task-name">Maths Mountain</div><div class="task-sub">Climb 10 number problems</div></div>
+          <div class="task-maps"><span class="map-piece">🗺️</span><span class="map-piece">🗺️</span></div>
+        </div>
+        <div class="task-row" style="background:var(--sky-light);border-color:#D4AAFF;color:#4A1870;" onclick="toggleTask(this)">
+          <div class="task-cb" style="color:var(--sky-purple);"></div>
+          <div class="task-icon">✏️</div>
+          <div class="task-body"><div class="task-name">Writing Waterfall</div><div class="task-sub">Carve 3 sentences in the rock</div></div>
+          <div class="task-maps"><span class="map-piece">🗺️</span><span class="map-piece">🗺️</span></div>
+        </div>
+        <div class="task-row" style="background:var(--earth-light);border-color:#D4A06A;color:#5A2E0E;" onclick="toggleTask(this)">
+          <div class="task-cb" style="color:var(--earth-mid);"></div>
+          <div class="task-icon">🌍</div>
+          <div class="task-body"><div class="task-name">Discovery Jungle</div><div class="task-sub">Explore today's topic</div></div>
+          <div class="task-maps"><span class="map-piece">🗺️</span><span class="map-piece">🗺️</span></div>
+        </div>
+      </div>
+
+      <!-- Right col -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Mini map -->
+        <div class="territory-map" style="padding:14px;">
+          <div class="map-title">🗺️ Territory Map Progress</div>
+          <div class="map-grid" style="grid-template-columns:repeat(4,1fr);gap:6px;">
+            <div class="territory unlocked" style="background:var(--river-light);border-color:var(--river-blue);color:var(--river-blue);" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">🏞️</span><div class="territory-name" style="font-size:10px;">Reading River</div></div>
+            <div class="territory locked" style="background:var(--sun-light);border-color:var(--sun-gold);color:#7A4F10;" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">⛰️</span><div class="territory-name" style="font-size:10px;">Maths Mountain</div></div>
+            <div class="territory locked" style="background:var(--sky-light);border-color:var(--sky-purple);color:var(--sky-purple);" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">💧</span><div class="territory-name" style="font-size:10px;">Writing Falls</div></div>
+            <div class="territory locked" style="background:var(--earth-light);border-color:var(--earth-mid);color:#5A2E0E;" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">🌴</span><div class="territory-name" style="font-size:10px;">Discovery Jungle</div></div>
+            <div class="territory locked" style="background:var(--jungle-pale);border-color:var(--jungle-mid);color:var(--jungle-dark);" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">🌋</span><div class="territory-name" style="font-size:10px;">Volcano Peak</div></div>
+            <div class="territory locked" style="background:var(--sand-light);border-color:var(--sand-yellow);color:#7A4210;" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">🏝️</span><div class="territory-name" style="font-size:10px;">Lost Island</div></div>
+            <div class="territory locked" style="background:var(--volcano-light);border-color:var(--volcano-red);color:#991B1B;" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">🦁</span><div class="territory-name" style="font-size:10px;">Safari Plains</div></div>
+            <div class="territory locked" style="background:var(--jungle-pale);border-color:var(--sun-gold);color:var(--jungle-dark);" onclick="this.classList.toggle('locked')"><span class="territory-icon" style="font-size:22px;">🏆</span><div class="territory-name" style="font-size:10px;">Explorer HQ</div></div>
+          </div>
+          <div style="margin-top:10px;font-size:10px;color:rgba(255,255,255,0.55);text-align:center;font-weight:700;letter-spacing:1px;">TAP TERRITORIES TO UNLOCK · COMPLETE ALL TO REACH EXPLORER HQ</div>
+        </div>
+
+        <!-- Map piece counter -->
+        <div style="background:var(--sun-light);border:2.5px solid var(--sun-gold);border-radius:14px;padding:14px 16px;">
+          <div style="font-family:'Righteous',cursive;font-size:15px;color:var(--earth-brown);margin-bottom:8px;">🗺️ Map Pieces Earned Today</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:20px;opacity:0.25;">🗺️</span><span style="font-size:20px;opacity:0.25;">🗺️</span><span style="font-size:20px;opacity:0.25;">🗺️</span><span style="font-size:20px;opacity:0.25;">🗺️</span>
+            <span style="font-size:20px;opacity:0.25;">🗺️</span><span style="font-size:20px;opacity:0.25;">🗺️</span><span style="font-size:20px;opacity:0.25;">🗺️</span><span style="font-size:20px;opacity:0.25;">🗺️</span>
+          </div>
+          <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--earth-mid);">Colour each 🗺️ as you earn it — every 3 pieces unlocks a new territory!</div>
+        </div>
+
+        <!-- Expedition status -->
+        <div style="background:var(--jungle-dark);border-radius:14px;padding:14px;color:white;">
+          <div style="font-family:'Righteous',cursive;font-size:14px;color:var(--jungle-light);margin-bottom:10px;">🧭 Expedition Status</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(116,198,157,0.15);border:1px solid var(--jungle-light);border-radius:8px;cursor:pointer;" onclick="this.querySelector('.st').textContent='✅ EXPLORED';this.style.borderColor='var(--jungle-light)';">
+              <span style="font-size:14px;">📖</span><span style="font-size:11px;font-weight:800;flex:1;letter-spacing:0.5px;">Reading River</span>
+              <span class="st" style="font-size:10px;font-weight:800;color:var(--jungle-light);opacity:0.6;">⏳ PENDING</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(116,198,157,0.15);border:1px solid var(--jungle-light);border-radius:8px;cursor:pointer;" onclick="this.querySelector('.st').textContent='✅ EXPLORED';this.style.borderColor='var(--jungle-light)';">
+              <span style="font-size:14px;">🔢</span><span style="font-size:11px;font-weight:800;flex:1;letter-spacing:0.5px;">Maths Mountain</span>
+              <span class="st" style="font-size:10px;font-weight:800;color:var(--jungle-light);opacity:0.6;">⏳ PENDING</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(116,198,157,0.15);border:1px solid var(--jungle-light);border-radius:8px;cursor:pointer;" onclick="this.querySelector('.st').textContent='✅ EXPLORED';this.style.borderColor='var(--jungle-light)';">
+              <span style="font-size:14px;">✏️</span><span style="font-size:11px;font-weight:800;flex:1;letter-spacing:0.5px;">Writing Waterfall</span>
+              <span class="st" style="font-size:10px;font-weight:800;color:var(--jungle-light);opacity:0.6;">⏳ PENDING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:18px;font-size:11px;font-weight:800;color:var(--soft);letter-spacing:1px;text-transform:uppercase;">
+      Adventure Explorer™ · Jungle Quest Homework System · <span style="color:var(--jungle-mid);">🌿 Every task reveals new territory!</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- EXPLORER BADGE           -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-badge">
+<div class="sheet">
+  <div class="sheet-header" style="background:var(--jungle-pale);border-bottom:3px solid var(--jungle-mid);">
+    <div class="header-tag" style="color:var(--jungle-mid);">✂️ Print & Cut</div>
+    <div class="header-title" style="color:var(--jungle-dark);">Explorer ID Badge<br><span style="color:var(--jungle-mid);">& Expedition Passport</span></div>
+    <div class="header-sub" style="color:var(--earth-brown);">Wear the badge. Open the passport. The expedition is live!</div>
+    <div class="header-icon">🏅</div>
+  </div>
+  <div class="sheet-body">
+    <div class="cut-hint"><div class="cut-line"></div>✂️ Cut out your badge<div class="cut-line"></div></div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;align-items:flex-start;">
+
+      <div class="exp-badge">
+        <div class="badge-vines"></div>
+        <div class="badge-top">
+          <div class="badge-logo">🌿</div>
+          <div class="badge-org">ADVENTURE EXPLORER™<br>Jungle Quest System</div>
+        </div>
+        <div class="badge-photo">📸<br>Photo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="badge-field"><div class="badge-fl">Explorer Name</div><div class="badge-fv"></div></div>
+          <div class="badge-field"><div class="badge-fl">Speciality</div><div class="badge-fv"></div></div>
+          <div class="badge-field"><div class="badge-fl">Base Camp</div><div class="badge-fv"></div></div>
+          <div class="badge-field"><div class="badge-fl">Explorer ID</div><div class="badge-fv"></div></div>
+        </div>
+        <div class="badge-rank">
+          <div class="badge-rl">Current Rank</div>
+          <div class="badge-rv">🌱 Jungle Cadet</div>
+        </div>
+      </div>
+
+      <!-- Expedition passport -->
+      <div style="width:200px;background:var(--earth-brown);border-radius:14px;border:3px solid var(--sun-gold);overflow:hidden;color:white;">
+        <div style="background:var(--sun-gold);padding:14px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:4px;">🌍</div>
+          <div style="font-family:'Righteous',cursive;font-size:16px;color:var(--jungle-dark);">EXPEDITION PASSPORT</div>
+          <div style="font-size:10px;font-weight:800;color:var(--jungle-dark);opacity:0.7;">Adventure Explorer™</div>
+        </div>
+        <div style="padding:16px;">
+          <div style="font-size:8px;font-weight:900;letter-spacing:2px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:4px;">Explorer Name</div>
+          <div style="border-bottom:1px solid rgba(255,255,255,0.2);height:22px;margin-bottom:12px;"></div>
+          <div style="font-size:8px;font-weight:900;letter-spacing:2px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:4px;">Territories Visited</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+            <div style="font-size:10px;font-weight:700;padding:5px 8px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;gap:4px;"><span>🏞️</span>River</div>
+            <div style="font-size:10px;font-weight:700;padding:5px 8px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;gap:4px;"><span>⛰️</span>Mountain</div>
+            <div style="font-size:10px;font-weight:700;padding:5px 8px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;gap:4px;"><span>💧</span>Waterfall</div>
+            <div style="font-size:10px;font-weight:700;padding:5px 8px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;gap:4px;"><span>🌴</span>Jungle</div>
+            <div style="font-size:10px;font-weight:700;padding:5px 8px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;gap:4px;"><span>🌋</span>Volcano</div>
+            <div style="font-size:10px;font-weight:700;padding:5px 8px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;gap:4px;"><span>🏝️</span>Island</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Choose speciality -->
+      <div style="background:var(--jungle-cream);border:2.5px dashed var(--jungle-mid);border-radius:16px;padding:18px;min-width:200px;">
+        <div style="font-family:'Righteous',cursive;font-size:15px;color:var(--jungle-dark);margin-bottom:14px;">🧭 Choose Your Speciality</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:white;border:2px solid #C8E6D0;cursor:pointer;">
+            <span style="font-size:20px;">🦋</span><span style="font-weight:800;font-size:13px;">Wildlife Expert</span>
+            <div style="margin-left:auto;width:16px;height:16px;border:2px solid var(--jungle-mid);border-radius:50%;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:white;border:2px solid #C8E6D0;cursor:pointer;">
+            <span style="font-size:20px;">🗺️</span><span style="font-weight:800;font-size:13px;">Map Maker</span>
+            <div style="margin-left:auto;width:16px;height:16px;border:2px solid var(--jungle-mid);border-radius:50%;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:white;border:2px solid #C8E6D0;cursor:pointer;">
+            <span style="font-size:20px;">🌿</span><span style="font-weight:800;font-size:13px;">Plant Scientist</span>
+            <div style="margin-left:auto;width:16px;height:16px;border:2px solid var(--jungle-mid);border-radius:50%;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:white;border:2px solid #C8E6D0;cursor:pointer;">
+            <span style="font-size:20px;">🧗</span><span style="font-weight:800;font-size:13px;">Terrain Climber</span>
+            <div style="margin-left:auto;width:16px;height:16px;border:2px solid var(--jungle-mid);border-radius:50%;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:white;border:2px solid #C8E6D0;">
+            <span style="font-size:20px;">✏️</span><span style="font-weight:800;font-size:13px;">My own: _______</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- TERRITORY MAP TRACKER    -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-map">
+<div class="sheet">
+  <div class="sheet-header" style="background:linear-gradient(135deg,var(--jungle-dark),var(--jungle-mid));">
+    <div class="header-tag" style="color:var(--sun-gold);">🗺️ Zeigarnik Reward System</div>
+    <div class="header-title" style="color:white;">Territory Map<br><span style="color:var(--jungle-light);">Unlock Tracker</span></div>
+    <div class="header-sub" style="color:rgba(255,255,255,0.7);">Every 3 Map Pieces = one new territory unlocked. Complete the whole map to reach Explorer HQ!</div>
+    <div class="header-icon">🌍</div>
+  </div>
+  <div class="sheet-body">
+
+    <div style="background:var(--river-light);border:2px solid #7EC8E3;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:24px;">🧠</span>
+      <div style="font-size:13px;font-weight:700;color:#0E6688;">The greyed-out territories show the whole jungle waiting to be explored. Your brain desperately wants to reveal the hidden territories — that urge is the Zeigarnik Effect and it's your expedition superpower!</div>
+    </div>
+
+    <!-- Large territory map -->
+    <div class="territory-map">
+      <div class="map-title">🌍 THE ADVENTURE JUNGLE — Full Territory Map</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;" id="fullMap">
+
+        <div class="territory unlocked" style="background:var(--river-light);border-color:var(--river-blue);color:var(--river-blue);" onclick="toggleTerritory(this)">
+          <span class="territory-icon">🏞️</span>
+          <div class="territory-name">Reading River</div>
+          <div class="territory-pts">FREE — Start here!</div>
+        </div>
+
+        <div class="territory locked" style="background:var(--sun-light);border-color:var(--sun-gold);color:#7A4F10;" onclick="toggleTerritory(this)">
+          <span class="territory-icon">⛰️</span>
+          <div class="territory-name">Maths Mountain</div>
+          <div class="territory-pts">3 🗺️ pieces</div>
+        </div>
+
+        <div class="territory locked" style="background:var(--sky-light);border-color:var(--sky-purple);color:var(--sky-purple);" onclick="toggleTerritory(this)">
+          <span class="territory-icon">💧</span>
+          <div class="territory-name">Writing Waterfall</div>
+          <div class="territory-pts">6 🗺️ pieces</div>
+        </div>
+
+        <div class="territory locked" style="background:var(--earth-light);border-color:var(--earth-mid);color:#5A2E0E;" onclick="toggleTerritory(this)">
+          <span class="territory-icon">🌴</span>
+          <div class="territory-name">Discovery Jungle</div>
+          <div class="territory-pts">9 🗺️ pieces</div>
+        </div>
+
+        <div class="territory locked" style="background:var(--jungle-pale);border-color:var(--jungle-mid);color:var(--jungle-dark);" onclick="toggleTerritory(this)">
+          <span class="territory-icon">🌋</span>
+          <div class="territory-name">Volcano Peak</div>
+          <div class="territory-pts">12 🗺️ pieces</div>
+        </div>
+
+        <div class="territory locked" style="background:var(--sand-light);border-color:var(--sand-yellow);color:#7A4210;" onclick="toggleTerritory(this)">
+          <span class="territory-icon">🏝️</span>
+          <div class="territory-name">Lost Island</div>
+          <div class="territory-pts">15 🗺️ pieces</div>
+        </div>
+
+        <div class="territory locked" style="background:var(--volcano-light);border-color:var(--volcano-red);color:#991B1B;" onclick="toggleTerritory(this)">
+          <span class="territory-icon">🦁</span>
+          <div class="territory-name">Safari Plains</div>
+          <div class="territory-pts">18 🗺️ pieces</div>
+        </div>
+
+        <div class="territory locked" style="background:var(--sun-light);border-color:var(--sun-gold);color:var(--earth-brown);" onclick="toggleTerritory(this)">
+          <span class="territory-icon">🏆</span>
+          <div class="territory-name">Explorer HQ!</div>
+          <div class="territory-pts">21 🗺️ pieces</div>
+        </div>
+
+      </div>
+
+      <!-- Map progress bar -->
+      <div style="margin-top:18px;position:relative;z-index:2;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.6);font-weight:800;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;">
+          <span>Expedition Start</span><span>Explorer HQ</span>
+        </div>
+        <div style="height:16px;background:rgba(0,0,0,0.4);border-radius:8px;border:1px solid rgba(116,198,157,0.3);overflow:hidden;">
+          <div id="mapBar" style="height:100%;background:linear-gradient(90deg,var(--jungle-light),var(--sun-gold));border-radius:8px;width:12%;transition:width 0.4s;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Territory legend -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;">
+      <div style="text-align:center;padding:12px;border:2px dashed rgba(233,196,106,0.5);border-radius:12px;background:var(--sun-light);">
+        <div style="font-size:22px;margin-bottom:4px;">🏞️</div>
+        <div style="font-family:'Righteous',cursive;font-size:13px;color:var(--earth-brown);">Free Territory</div>
+        <div style="font-size:10px;font-weight:700;color:var(--soft);">Just for starting!</div>
+      </div>
+      <div style="text-align:center;padding:12px;border:2px solid #E2E8F0;border-radius:12px;background:#F9FAFB;">
+        <div style="font-size:22px;margin-bottom:4px;filter:grayscale(1);opacity:0.3;">⛰️</div>
+        <div style="font-family:'Righteous',cursive;font-size:13px;color:var(--soft);">Locked Territory</div>
+        <div style="font-size:10px;font-weight:700;color:var(--soft);">Earn map pieces to unlock</div>
+      </div>
+      <div style="text-align:center;padding:12px;border:2px solid var(--jungle-mid);border-radius:12px;background:var(--jungle-pale);">
+        <div style="font-size:22px;margin-bottom:4px;">🌴</div>
+        <div style="font-family:'Righteous',cursive;font-size:13px;color:var(--jungle-dark);">Unlocked!</div>
+        <div style="font-size:10px;font-weight:700;color:var(--soft);">Territory discovered — well done!</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- MAP PIECE TOKENS         -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-tokens">
+<div class="sheet">
+  <div class="sheet-header" style="background:var(--earth-light);border-bottom:3px solid var(--earth-mid);">
+    <div class="header-tag" style="color:var(--earth-brown);">🗺️ Dopamine Ramp System</div>
+    <div class="header-title" style="color:var(--dark);">Map Piece<br><span style="color:var(--earth-brown);">Collection</span></div>
+    <div class="header-sub" style="color:var(--earth-mid);">Every 3 homework tasks = 1 map piece. Click or colour each one earned!</div>
+    <div class="header-icon">🧭</div>
+  </div>
+  <div class="sheet-body">
+    <div style="background:var(--jungle-pale);border:2px solid var(--jungle-light);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:24px;">🧠</span>
+      <div style="font-size:13px;font-weight:700;color:var(--jungle-dark);">Instead of one massive pile of homework, the explorer earns one map piece at a time. Each piece is a small win that releases dopamine — building momentum and unlocking the next hidden territory!</div>
+    </div>
+    <div class="mp-grid" id="mpGrid"></div>
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div style="background:var(--jungle-pale);border:2px solid var(--jungle-mid);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:4px;">🗺️🗺️🗺️</div>
+        <div style="font-family:'Righteous',cursive;font-size:13px;color:var(--jungle-dark);">3 Pieces</div>
+        <div style="font-size:10px;font-weight:700;color:var(--soft);margin-top:2px;">= New territory unlocked!</div>
+      </div>
+      <div style="background:var(--river-light);border:2px solid var(--river-blue);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:4px;">🗺️×6</div>
+        <div style="font-family:'Righteous',cursive;font-size:13px;color:#0E6688;">6 Pieces</div>
+        <div style="font-size:10px;font-weight:700;color:var(--soft);margin-top:2px;">= Half the map revealed</div>
+      </div>
+      <div style="background:var(--sky-light);border:2px solid var(--sky-purple);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:4px;">🗺️×12</div>
+        <div style="font-family:'Righteous',cursive;font-size:13px;color:var(--sky-purple);">12 Pieces</div>
+        <div style="font-size:10px;font-weight:700;color:var(--soft);margin-top:2px;">= Halfway to Explorer HQ!</div>
+      </div>
+      <div style="background:var(--sun-light);border:2px solid var(--sun-gold);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:4px;">🗺️×21</div>
+        <div style="font-family:'Righteous',cursive;font-size:13px;color:var(--earth-brown);">21 Pieces</div>
+        <div style="font-size:10px;font-weight:700;color:var(--soft);margin-top:2px;">= EXPLORER HQ REACHED 🏆</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- SUBJECT TERRITORIES      -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-subjects">
+<div class="sheet">
+  <div class="sheet-header" style="background:linear-gradient(135deg,var(--jungle-dark),var(--jungle-mid));">
+    <div class="header-tag" style="color:var(--jungle-light);">📚 Subject Missions</div>
+    <div class="header-title" style="color:white;">Subject Territory<br><span style="color:var(--jungle-light);">Exploration Cards</span></div>
+    <div class="header-sub" style="color:rgba(255,255,255,0.7);">Each subject is a new territory to explore — one step at a time!</div>
+    <div class="header-icon">🌿</div>
+  </div>
+  <div class="sheet-body">
+    <div style="background:var(--sun-light);border:2px solid var(--sun-gold);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:24px;">🧭</span>
+      <div style="font-size:13px;font-weight:700;color:var(--earth-brown);">Guide tip: Use action words! Instead of "do reading" write "read pages 10 to 15 and find 2 new words." Specific tasks are much easier for explorer brains to start!</div>
+    </div>
+    <div class="subj-grid">
+
+      <div class="subj-card" style="background:var(--river-light);border-color:#7EC8E3;">
+        <div class="subj-header"><div class="subj-icon">🏞️</div>
+          <div><div class="subj-title" style="color:#0E6688;">Reading River</div><div class="subj-tag" style="color:var(--river-blue);">Earn 1 🗺️ per 5 mins read</div></div>
+        </div>
+        <div class="subj-task" style="border-color:#AEE2F5;"><div class="subj-cb" style="border-color:var(--river-blue);"></div><div class="subj-text" style="color:#0E6688;">Read pages ___ to ___</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#AEE2F5;"><div class="subj-cb" style="border-color:var(--river-blue);"></div><div class="subj-text" style="color:#0E6688;">Find 3 new explorer words</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#AEE2F5;"><div class="subj-cb" style="border-color:var(--river-blue);"></div><div class="subj-text" style="color:#0E6688;">Tell someone what happened</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:transparent;background:transparent;"><div class="subj-cb" style="border-color:#AEE2F5;border-style:dashed;"></div><div style="flex:1;border-bottom:1px dashed #AEE2F5;height:16px;"></div><div class="subj-piece" style="opacity:0.15;">🗺️</div></div>
+      </div>
+
+      <div class="subj-card" style="background:var(--sun-light);border-color:#F5D073;">
+        <div class="subj-header"><div class="subj-icon">⛰️</div>
+          <div><div class="subj-title" style="color:#7A4F10;">Maths Mountain</div><div class="subj-tag" style="color:var(--sand-yellow);">Earn 1 🗺️ per 3 problems</div></div>
+        </div>
+        <div class="subj-task" style="border-color:#F5D8A0;"><div class="subj-cb" style="border-color:var(--sun-gold);"></div><div class="subj-text" style="color:#7A4F10;">Solve problems 1 to ___</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#F5D8A0;"><div class="subj-cb" style="border-color:var(--sun-gold);"></div><div class="subj-text" style="color:#7A4F10;">Check your answers carefully</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#F5D8A0;"><div class="subj-cb" style="border-color:var(--sun-gold);"></div><div class="subj-text" style="color:#7A4F10;">Write the trickiest one again</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:transparent;background:transparent;"><div class="subj-cb" style="border-color:#F5D8A0;border-style:dashed;"></div><div style="flex:1;border-bottom:1px dashed #F5D8A0;height:16px;"></div><div class="subj-piece" style="opacity:0.15;">🗺️</div></div>
+      </div>
+
+      <div class="subj-card" style="background:var(--sky-light);border-color:#D4AAFF;">
+        <div class="subj-header"><div class="subj-icon">💧</div>
+          <div><div class="subj-title" style="color:#4A1870;">Writing Waterfall</div><div class="subj-tag" style="color:var(--sky-purple);">Earn 1 🗺️ per sentence</div></div>
+        </div>
+        <div class="subj-task" style="border-color:#DDB8FF;"><div class="subj-cb" style="border-color:var(--sky-purple);"></div><div class="subj-text" style="color:#4A1870;">Write sentence 1</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#DDB8FF;"><div class="subj-cb" style="border-color:var(--sky-purple);"></div><div class="subj-text" style="color:#4A1870;">Write sentence 2</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#DDB8FF;"><div class="subj-cb" style="border-color:var(--sky-purple);"></div><div class="subj-text" style="color:#4A1870;">Read it back out loud</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:transparent;background:transparent;"><div class="subj-cb" style="border-color:#DDB8FF;border-style:dashed;"></div><div style="flex:1;border-bottom:1px dashed #DDB8FF;height:16px;"></div><div class="subj-piece" style="opacity:0.15;">🗺️</div></div>
+      </div>
+
+      <div class="subj-card" style="background:var(--earth-light);border-color:#D4A06A;">
+        <div class="subj-header"><div class="subj-icon">🌴</div>
+          <div><div class="subj-title" style="color:#5A2E0E;">Discovery Jungle</div><div class="subj-tag" style="color:var(--earth-mid);">Earn 1 🗺️ per fact found</div></div>
+        </div>
+        <div class="subj-task" style="border-color:#E4BF95;"><div class="subj-cb" style="border-color:var(--earth-mid);"></div><div class="subj-text" style="color:#5A2E0E;">Read about today's topic</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#E4BF95;"><div class="subj-cb" style="border-color:var(--earth-mid);"></div><div class="subj-text" style="color:#5A2E0E;">Write 2 facts I discovered</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:#E4BF95;"><div class="subj-cb" style="border-color:var(--earth-mid);"></div><div class="subj-text" style="color:#5A2E0E;">Draw something from it</div><div class="subj-piece">🗺️</div></div>
+        <div class="subj-task" style="border-color:transparent;background:transparent;"><div class="subj-cb" style="border-color:#E4BF95;border-style:dashed;"></div><div style="flex:1;border-bottom:1px dashed #E4BF95;height:16px;"></div><div class="subj-piece" style="opacity:0.15;">🗺️</div></div>
+      </div>
+
+    </div>
+
+    <!-- Custom card -->
+    <div style="margin-top:16px;border:3px dashed #C8E6D0;border-radius:16px;padding:18px;">
+      <div style="font-family:'Righteous',cursive;font-size:15px;color:var(--soft);margin-bottom:12px;">✏️ My Custom Territory</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div><div class="fl">Territory Name</div><div class="fv" style="color:var(--jungle-mid);border-color:#C8E6D0;opacity:0.5;"></div></div>
+        <div><div class="fl">Map piece rule</div><div class="fv" style="color:var(--jungle-mid);border-color:#C8E6D0;opacity:0.5;"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:10px;align-items:center;"><div style="width:20px;height:20px;border:2px dashed #C8E6D0;border-radius:5px;flex-shrink:0;"></div><div style="flex:1;border-bottom:1px dashed #C8E6D0;height:18px;"></div><span style="font-size:13px;opacity:0.3;">🗺️</span></div>
+        <div style="display:flex;gap:10px;align-items:center;"><div style="width:20px;height:20px;border:2px dashed #C8E6D0;border-radius:5px;flex-shrink:0;"></div><div style="flex:1;border-bottom:1px dashed #C8E6D0;height:18px;"></div><span style="font-size:13px;opacity:0.3;">🗺️</span></div>
+        <div style="display:flex;gap:10px;align-items:center;"><div style="width:20px;height:20px;border:2px dashed #C8E6D0;border-radius:5px;flex-shrink:0;"></div><div style="flex:1;border-bottom:1px dashed #C8E6D0;height:18px;"></div><span style="font-size:13px;opacity:0.3;">🗺️</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- NATURE BREAKS            -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-breaks">
+<div class="sheet">
+  <div class="sheet-header" style="background:linear-gradient(135deg,#1B4332,#2D6A4F);">
+    <div class="header-tag" style="color:var(--jungle-light);">🌿 Nature Reset Toolkit</div>
+    <div class="header-title" style="color:white;">Jungle Nature<br><span style="color:var(--sun-gold);">Brain Breaks</span></div>
+    <div class="header-sub" style="color:rgba(255,255,255,0.7);">Every explorer needs to rest and refuel — 3 minutes in nature mode!</div>
+    <div class="header-icon">🦋</div>
+  </div>
+  <div class="sheet-body">
+    <div style="background:var(--jungle-pale);border:2px solid var(--jungle-light);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:24px;">🧠</span>
+      <div style="font-size:13px;font-weight:700;color:var(--jungle-dark);">Nature breaks are part of every expedition! Real explorers rest and observe before pushing on. 3 minutes in nature mode helps the brain reset so the next territory is easier to explore.</div>
+    </div>
+    <div class="nature-grid">
+      <div class="nature-card" style="background:var(--jungle-pale);border-color:var(--jungle-light);">
+        <span class="nc-icon">🦁</span>
+        <div class="nc-title" style="color:var(--jungle-dark);">Lion Breath</div>
+        <div class="nc-desc">Breathe in deeply through your nose, then roar it all out through your mouth. Do it 5 times. Release all the tension!</div>
+      </div>
+      <div class="nature-card" style="background:var(--river-light);border-color:#7EC8E3;">
+        <span class="nc-icon">🐍</span>
+        <div class="nc-title" style="color:#0E6688;">Snake Stretch</div>
+        <div class="nc-desc">Lie flat on the floor. Slowly raise your chest like a cobra. Hold for 5 breaths. Feel the jungle floor beneath you.</div>
+      </div>
+      <div class="nature-card" style="background:var(--sun-light);border-color:var(--sun-gold);">
+        <span class="nc-icon">🦒</span>
+        <div class="nc-title" style="color:var(--earth-brown);">Giraffe Neck</div>
+        <div class="nc-desc">Stand tall, reach arms to the sky like a giraffe neck. Stretch slowly left, right, forward, back. 3 times each.</div>
+      </div>
+      <div class="nature-card" style="background:var(--earth-light);border-color:var(--earth-mid);">
+        <span class="nc-icon">🐘</span>
+        <div class="nc-title" style="color:#5A2E0E;">Elephant Walk</div>
+        <div class="nc-desc">Walk heavily around the room with slow stompy elephant steps for 1 full minute. Feel every footfall on the ground.</div>
+      </div>
+      <div class="nature-card" style="background:var(--sky-light);border-color:#D4AAFF;">
+        <span class="nc-icon">🦋</span>
+        <div class="nc-title" style="color:var(--sky-purple);">Butterfly Float</div>
+        <div class="nc-desc">Spread your arms wide like wings. Float them slowly up and down while taking the deepest breaths you can. 5 times.</div>
+      </div>
+      <div class="nature-card" style="background:var(--volcano-light);border-color:var(--volcano-red);">
+        <span class="nc-icon">🦅</span>
+        <div class="nc-title" style="color:#991B1B;">Eagle Vision</div>
+        <div class="nc-desc">Sit still and look out the window. Name 5 things you can see, 3 things you can hear, 1 thing you can smell. Full explorer scan.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;background:var(--jungle-dark);border-radius:14px;padding:14px 20px;color:white;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:28px;">⏱️</span>
+      <div style="font-size:13px;font-weight:700;">Set a 3-minute expedition timer. When it sounds — back to the territory! The map is waiting to be revealed. 🗺️</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- EXPLORER RANKS           -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-ranks">
+<div class="sheet">
+  <div class="sheet-header" style="background:linear-gradient(135deg,var(--earth-brown),var(--earth-mid));">
+    <div class="header-tag" style="color:var(--sun-gold);">🏅 Explorer Progression</div>
+    <div class="header-title" style="color:white;">Explorer Rank<br><span style="color:var(--sun-gold);">System</span></div>
+    <div class="header-sub" style="color:rgba(255,255,255,0.7);">Earn ranks through effort, curiosity, and showing up — not perfection!</div>
+    <div class="header-icon">🧗</div>
+  </div>
+  <div class="sheet-body">
+    <div style="display:flex;flex-direction:column;">
+      <div class="rank-row" style="background:var(--jungle-pale);border-color:var(--jungle-light);">
+        <div class="rank-icon">🌱</div>
+        <div><div class="rank-level">Rank 1</div><div class="rank-name" style="color:var(--jungle-dark);">Jungle Cadet</div><div class="rank-desc">Learning to use the expedition kit and earn first map pieces</div></div>
+        <div class="rank-req" style="color:var(--jungle-mid);">Start here<br>FREE 🎁</div>
+      </div>
+      <div class="rank-conn"></div>
+      <div class="rank-row" style="background:var(--river-light);border-color:#7EC8E3;">
+        <div class="rank-icon">🗺️</div>
+        <div><div class="rank-level">Rank 2</div><div class="rank-name" style="color:#0E6688;">Trail Explorer</div><div class="rank-desc">Completing homework territories with some guide support</div></div>
+        <div class="rank-req" style="color:var(--river-blue);">5 territories<br>explored</div>
+      </div>
+      <div class="rank-conn"></div>
+      <div class="rank-row" style="background:var(--sun-light);border-color:#F5D073;">
+        <div class="rank-icon">🧭</div>
+        <div><div class="rank-level">Rank 3</div><div class="rank-name" style="color:#7A4F10;">Senior Explorer</div><div class="rank-desc">Using nature breaks independently and navigating subjects alone</div></div>
+        <div class="rank-req" style="color:var(--sun-gold);">10 territories<br>+ 2 full map reveals</div>
+      </div>
+      <div class="rank-conn"></div>
+      <div class="rank-row" style="background:var(--sky-light);border-color:#D4AAFF;">
+        <div class="rank-icon">🏔️</div>
+        <div><div class="rank-level">Rank 4</div><div class="rank-name" style="color:#4A1870;">Lead Expedition Guide</div><div class="rank-desc">Planning their own expedition and teaching others the system</div></div>
+        <div class="rank-req" style="color:var(--sky-purple);">20 territories<br>+ consistent effort</div>
+      </div>
+      <div class="rank-conn"></div>
+      <div class="rank-row" style="background:linear-gradient(135deg,var(--jungle-dark),var(--jungle-mid));border-color:var(--sun-gold);">
+        <div class="rank-icon">🏆</div>
+        <div><div class="rank-level" style="color:rgba(255,255,255,0.5);">Rank 5 — Elite</div><div class="rank-name" style="color:var(--sun-gold);">Chief Adventure Explorer</div><div class="rank-desc" style="color:rgba(255,255,255,0.65);">Master of all territories — the highest honour in the jungle</div></div>
+        <div class="rank-req" style="color:var(--sun-gold);">30 territories<br>+ mastery</div>
+      </div>
+    </div>
+    <div style="margin-top:18px;background:var(--sun-light);border:2px solid var(--sun-gold);border-radius:12px;padding:12px 18px;font-size:12px;font-weight:700;color:var(--earth-brown);text-align:center;">
+      🌿 Ranks earned for: showing up · asking for help · taking a nature break · trying again · completing even one territory · NOT perfection
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- GUIDE SCRIPTS            -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-scripts">
+<div class="sheet">
+  <div class="sheet-header" style="background:var(--earth-light);border-bottom:3px solid var(--earth-mid);">
+    <div class="header-tag" style="color:var(--earth-brown);">💬 Expedition Guide Scripts</div>
+    <div class="header-title" style="color:var(--dark);">Guide Leader<br><span style="color:var(--earth-brown);">Script Swaps</span></div>
+    <div class="header-sub" style="color:var(--earth-mid);">You are the Expedition Guide — your calm leads the way!</div>
+    <div class="header-icon">📢</div>
+  </div>
+  <div class="sheet-body">
+    <div style="background:var(--jungle-pale);border:2px solid var(--jungle-light);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+      <span style="font-size:24px;">🧠</span>
+      <div style="font-size:13px;font-weight:700;color:var(--jungle-dark);">When YOU stay calm as the Expedition Guide, your child's mirror neurons activate — they start to reflect your calm. The role-play gives both of you a character to step into, which dramatically reduces the emotional charge of homework time.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="scr-row">
+        <div class="scr-box" style="background:#FEF2F2;border-color:#FECACA;"><div class="scr-tag" style="color:var(--volcano-red);">❌ Instead of...</div><div class="scr-text" style="color:#991B1B;">"Do your homework — stop avoiding it!"</div></div>
+        <div class="scr-arrow">→</div>
+        <div class="scr-box" style="background:var(--jungle-pale);border-color:var(--jungle-light);"><div class="scr-tag" style="color:var(--jungle-mid);">✅ Guide says...</div><div class="scr-text" style="color:var(--jungle-dark);">"Explorer, your first territory has been marked on the map. Reading River is waiting — shall we head there now?"</div></div>
+      </div>
+      <div class="scr-row">
+        <div class="scr-box" style="background:#FEF2F2;border-color:#FECACA;"><div class="scr-tag" style="color:var(--volcano-red);">❌ Instead of...</div><div class="scr-text" style="color:#991B1B;">"Why is it taking so long? It's only 5 questions!"</div></div>
+        <div class="scr-arrow">→</div>
+        <div class="scr-box" style="background:var(--jungle-pale);border-color:var(--jungle-light);"><div class="scr-tag" style="color:var(--jungle-mid);">✅ Guide says...</div><div class="scr-text" style="color:var(--jungle-dark);">"One more problem and you earn the next map piece. Your patient is one step closer to unlocking Maths Mountain!"</div></div>
+      </div>
+      <div class="scr-row">
+        <div class="scr-box" style="background:#FEF2F2;border-color:#FECACA;"><div class="scr-tag" style="color:var(--volcano-red);">❌ Instead of...</div><div class="scr-text" style="color:#991B1B;">"Stop crying — it's just homework!"</div></div>
+        <div class="scr-arrow">→</div>
+        <div class="scr-box" style="background:var(--jungle-pale);border-color:var(--jungle-light);"><div class="scr-tag" style="color:var(--jungle-mid);">✅ Guide says...</div><div class="scr-text" style="color:var(--jungle-dark);">"Looks like the explorer needs a nature break. Pick any card — 3 minutes then back to the territory!"</div></div>
+      </div>
+      <div class="scr-row">
+        <div class="scr-box" style="background:#FEF2F2;border-color:#FECACA;"><div class="scr-tag" style="color:var(--volcano-red);">❌ Instead of...</div><div class="scr-text" style="color:#991B1B;">"You haven't even started. This is ridiculous."</div></div>
+        <div class="scr-arrow">→</div>
+        <div class="scr-box" style="background:var(--jungle-pale);border-color:var(--jungle-light);"><div class="scr-tag" style="color:var(--jungle-mid);">✅ Guide says...</div><div class="scr-text" style="color:var(--jungle-dark);">"Let's do the very first step together — just one. Every great expedition starts with a single footstep."</div></div>
+      </div>
+      <div class="scr-row">
+        <div class="scr-box" style="background:#FEF2F2;border-color:#FECACA;"><div class="scr-tag" style="color:var(--volcano-red);">❌ Instead of...</div><div class="scr-text" style="color:#991B1B;">"No screens until every bit of homework is done."</div></div>
+        <div class="scr-arrow">→</div>
+        <div class="scr-box" style="background:var(--jungle-pale);border-color:var(--jungle-light);"><div class="scr-tag" style="color:var(--jungle-mid);">✅ Guide says...</div><div class="scr-text" style="color:var(--jungle-dark);">"Every map piece you earn reveals more of the jungle. How many territories can you unlock today? You decide."</div></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:var(--jungle-dark);border-radius:12px;padding:14px 20px;color:white;text-align:center;">
+      <div style="font-family:'Righteous',cursive;font-size:16px;color:var(--jungle-light);margin-bottom:4px;">🌿 Expedition Guide Principle</div>
+      <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);font-style:italic;">"A calm guide leads a brave explorer. Your tone is the expedition's most powerful compass."</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- WEEKLY JOURNAL           -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-weekly">
+<div class="sheet">
+  <div class="sheet-header" style="background:var(--earth-light);border-bottom:3px solid var(--earth-mid);">
+    <div class="header-tag" style="color:var(--earth-brown);">📔 Expedition Journal</div>
+    <div class="header-title" style="color:var(--dark);">Weekly Expedition<br><span style="color:var(--earth-brown);">Journal</span></div>
+    <div class="header-sub" style="color:var(--earth-mid);">Track your 5-day expedition — celebrate every territory explored!</div>
+    <div class="header-icon">📊</div>
+  </div>
+  <div class="sheet-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;">
+      <div><div class="fl">Week of</div><div class="fv" style="color:var(--jungle-mid);border-color:var(--jungle-mid);opacity:0.4;"></div></div>
+      <div><div class="fl">Explorer Name</div><div class="fv" style="color:var(--jungle-mid);border-color:var(--jungle-mid);opacity:0.4;"></div></div>
+      <div><div class="fl">Current Rank</div><div class="fv" style="color:var(--jungle-mid);border-color:var(--jungle-mid);opacity:0.4;"></div></div>
+    </div>
+    <div class="wk-grid">
+      <div class="wk-col"><div class="wk-head">MON</div><div class="wk-body">
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Reading</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Maths</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Writing</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Topic</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Other</div></div>
+      </div><div class="wk-pieces">🗺️___</div></div>
+      <div class="wk-col"><div class="wk-head">TUE</div><div class="wk-body">
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Reading</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Maths</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Writing</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Topic</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Other</div></div>
+      </div><div class="wk-pieces">🗺️___</div></div>
+      <div class="wk-col"><div class="wk-head">WED</div><div class="wk-body">
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Reading</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Maths</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Writing</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Topic</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Other</div></div>
+      </div><div class="wk-pieces">🗺️___</div></div>
+      <div class="wk-col"><div class="wk-head">THU</div><div class="wk-body">
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Reading</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Maths</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Writing</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Topic</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Other</div></div>
+      </div><div class="wk-pieces">🗺️___</div></div>
+      <div class="wk-col"><div class="wk-head">FRI</div><div class="wk-body">
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Reading</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Maths</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Writing</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Topic</div></div>
+        <div class="wk-slot"><div class="wk-cb"></div><div class="wk-sub">Other</div></div>
+      </div><div class="wk-pieces">🗺️___</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:16px;">
+      <div style="border:2px solid #C8E6D0;border-radius:12px;padding:14px;"><div class="fl" style="margin-bottom:8px;">🌿 This Week's Discoveries</div><div style="border-bottom:1px dashed #C8E6D0;height:24px;margin-bottom:6px;"></div><div style="border-bottom:1px dashed #C8E6D0;height:24px;margin-bottom:6px;"></div><div style="border-bottom:1px dashed #C8E6D0;height:24px;"></div></div>
+      <div style="border:2px solid #C8E6D0;border-radius:12px;padding:14px;"><div class="fl" style="margin-bottom:8px;">🦋 Nature Breaks Taken</div><div style="border-bottom:1px dashed #C8E6D0;height:24px;margin-bottom:6px;"></div><div style="border-bottom:1px dashed #C8E6D0;height:24px;margin-bottom:6px;"></div><div style="border-bottom:1px dashed #C8E6D0;height:24px;"></div></div>
+      <div style="border:2px solid var(--sun-gold);border-radius:12px;padding:14px;background:var(--sun-light);">
+        <div class="fl" style="color:var(--earth-brown);margin-bottom:8px;">🗺️ Total Map Pieces</div>
+        <div style="font-family:'Righteous',cursive;font-size:38px;color:var(--jungle-dark);text-align:center;margin-top:8px;">___</div>
+        <div style="text-align:center;font-size:10px;font-weight:800;color:var(--earth-mid);">THIS WEEK</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- CERTIFICATES             -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-cert">
+<div class="sheet">
+  <div class="sheet-header" style="background:linear-gradient(135deg,var(--jungle-dark),var(--jungle-mid));">
+    <div class="header-tag" style="color:var(--sun-gold);">🏆 Achievement Awards</div>
+    <div class="header-title" style="color:white;">Territory Conquered<br><span style="color:var(--sun-gold);">Certificates</span></div>
+    <div class="header-sub" style="color:rgba(255,255,255,0.7);">Print, sign, and celebrate — every expedition deserves recognition!</div>
+    <div class="header-icon">🎖️</div>
+  </div>
+  <div class="sheet-body">
+    <div class="cert">
+      <div class="cert-corner" style="top:16px;left:20px;">🌿</div>
+      <div class="cert-corner" style="top:16px;right:20px;">🌿</div>
+      <div class="cert-corner" style="bottom:16px;left:20px;">🗺️</div>
+      <div class="cert-corner" style="bottom:16px;right:20px;">🗺️</div>
+      <div class="cert-badge">🌍</div>
+      <div class="cert-org">Adventure Explorer™ · Jungle Quest Homework System</div>
+      <div class="cert-title">Territory Conquered!</div>
+      <div class="cert-sub">This certificate is proudly awarded to Explorer</div>
+      <div class="cert-name-line"></div>
+      <div class="cert-name-label">Explorer Name</div>
+      <div class="cert-reason">"For completing an expedition through the homework jungle with courage, curiosity, and determination"</div>
+      <div style="font-size:26px;margin-bottom:14px;">🌿 🗺️ 🦋 ⛰️ 🏆</div>
+      <div class="cert-footer">
+        <div><div class="cert-sig-line"></div><div class="cert-sig-label">Expedition Guide (Parent)</div></div>
+        <div style="font-size:44px;align-self:center;">🧭</div>
+        <div><div class="cert-sig-line"></div><div class="cert-sig-label">Date of Conquest</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+      <div style="border:3px solid var(--jungle-mid);border-radius:14px;padding:16px;text-align:center;background:var(--jungle-pale);">
+        <div style="font-size:30px;margin-bottom:6px;">🔄</div>
+        <div style="font-family:'Righteous',cursive;color:var(--jungle-dark);font-size:14px;">Resilient Explorer</div>
+        <div style="font-size:11px;color:var(--jungle-mid);margin-top:4px;font-weight:700;">Took a nature break and came back to finish!</div>
+      </div>
+      <div style="border:3px solid var(--sun-gold);border-radius:14px;padding:16px;text-align:center;background:var(--sun-light);">
+        <div style="font-size:30px;margin-bottom:6px;">📅</div>
+        <div style="font-family:'Righteous',cursive;color:var(--earth-brown);font-size:14px;">5-Day Expedition Award</div>
+        <div style="font-size:11px;color:var(--earth-mid);margin-top:4px;font-weight:700;">Explored new territories every day this week!</div>
+      </div>
+      <div style="border:3px solid var(--river-blue);border-radius:14px;padding:16px;text-align:center;background:var(--river-light);">
+        <div style="font-size:30px;margin-bottom:6px;">🗺️</div>
+        <div style="font-family:'Righteous',cursive;color:#0E6688;font-size:14px;">Full Map Revealed!</div>
+        <div style="font-size:11px;color:var(--river-blue);margin-top:4px;font-weight:700;">All 21 map pieces earned — Explorer HQ reached!</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ======================== -->
+<!-- GUIDE LEADER BRIEF       -->
+<!-- ======================== -->
+<div class="page-wrap" id="page-guide">
+<div class="sheet">
+  <div class="sheet-header" style="background:var(--earth-light);border-bottom:3px solid var(--earth-mid);">
+    <div class="header-tag" style="color:var(--earth-brown);">📖 Guide Leader Only</div>
+    <div class="header-title" style="color:var(--dark);">Expedition Guide<br><span style="color:var(--earth-brown);">Leader Brief</span></div>
+    <div class="header-sub" style="color:var(--earth-mid);">Everything you need to run Adventure Explorer™ in under 10 minutes</div>
+    <div class="header-icon">🧭</div>
+  </div>
+  <div class="sheet-body">
+    <div class="guide-box" style="background:var(--jungle-cream);border-color:#C8E6D0;">
+      <div class="guide-title" style="color:var(--jungle-dark);">🌍 The Expedition Brief</div>
+      <div class="guide-text">The jungle is full of undiscovered territories — and only your child, the Explorer, can chart them. Each homework subject is a new territory on the map. Every task completed earns a Map Piece. Every 3 pieces unlocks a new territory on the visual map. Reach Explorer HQ and a certificate is awarded.<br><br>You are the <strong>Expedition Guide</strong> — calm, curious, and always one step ahead on the trail.</div>
+    </div>
+    <div class="guide-box" style="background:var(--jungle-cream);border-color:#C8E6D0;">
+      <div class="guide-title" style="color:var(--jungle-dark);">⚡ Quick Setup (5 Minutes)</div>
+      <div class="guide-text">
+        <strong>Step 1:</strong> Print the Explorer Badge — let your child choose their name and speciality.<br>
+        <strong>Step 2:</strong> Open the Territory Map together — show the greyed territories they'll unlock.<br>
+        <strong>Step 3:</strong> Give the 2 FREE Map Pieces immediately for starting.<br>
+        <strong>Step 4:</strong> Issue ONE subject territory card — not all of them at once.<br>
+        <strong>Step 5:</strong> Sit alongside for the first 5 minutes only.
+      </div>
+      <div class="guide-highlight" style="background:var(--sun-light);border-color:var(--sun-gold);">
+        <div class="guide-highlight-text" style="color:var(--earth-brown);">💡 "Never say 'do all your homework.' Say 'Explorer, Reading River has been marked on your map — how many map pieces can you earn there today?' Specific territory framing eliminates task paralysis."</div>
+      </div>
+    </div>
+    <div class="guide-box" style="background:var(--jungle-cream);border-color:#C8E6D0;">
+      <div class="guide-title" style="color:var(--jungle-dark);">🧠 The Science (Quick Version)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--jungle-pale);border:2px solid var(--jungle-light);border-radius:10px;padding:12px;">
+          <div style="font-family:'Righteous',cursive;font-size:14px;color:var(--jungle-dark);margin-bottom:5px;">🗺️ Dopamine Ramp</div>
+          <div style="font-size:12px;font-weight:600;color:var(--jungle-mid);">Each map piece is a micro-win releasing dopamine. The brain chases the next piece — building momentum without nagging.</div>
+        </div>
+        <div style="background:var(--river-light);border:2px solid #7EC8E3;border-radius:10px;padding:12px;">
+          <div style="font-family:'Righteous',cursive;font-size:14px;color:#0E6688;margin-bottom:5px;">🧩 Zeigarnik Effect</div>
+          <div style="font-size:12px;font-weight:600;color:#0E6688;">The greyed map territories create an open loop the brain compulsively wants to fill — driving completion without pressure.</div>
+        </div>
+        <div style="background:var(--sun-light);border:2px solid var(--sun-gold);border-radius:10px;padding:12px;">
+          <div style="font-family:'Righteous',cursive;font-size:14px;color:var(--earth-brown);margin-bottom:5px;">🎁 Initial Endowment</div>
+          <div style="font-size:12px;font-weight:600;color:var(--earth-mid);">2 free pieces removes the hardest barrier — starting. The brain feels already in motion, making the next step far easier.</div>
+        </div>
+        <div style="background:var(--sky-light);border:2px solid #D4AAFF;border-radius:10px;padding:12px;">
+          <div style="font-family:'Righteous',cursive;font-size:14px;color:#4A1870;margin-bottom:5px;">🪞 Mirror Neurons</div>
+          <div style="font-size:12px;font-weight:600;color:#4A1870;">Calm Guide = calm Explorer. The role-play gives both parties a persona — reducing the emotional charge of homework time.</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--jungle-dark);border-radius:12px;padding:18px 22px;color:white;text-align:center;">
+      <div style="font-family:'Righteous',cursive;font-size:18px;color:var(--jungle-light);margin-bottom:8px;">🌿 The NovaHEART Principle</div>
+      <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85);line-height:1.6;font-style:italic;">"Traditional homework charts demand discipline, which leads to nightly fights at the kitchen table. This system is different. Adventure Explorer™ turns your child's homework into a jungle expedition they actually want to complete."<br><br>Built by a neurodivergent founder — for families who live it every day.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page-wrap').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function toggleTask(el) {
+    const cb = el.querySelector('.task-cb');
+    cb.classList.toggle('done');
+    cb.textContent = cb.classList.contains('done') ? '✓' : '';
+  }
+  function toggleTerritory(el) {
+    el.classList.toggle('locked');
+    el.classList.toggle('unlocked');
+    updateMapBar();
+  }
+  function updateMapBar() {
+    const total = document.querySelectorAll('#fullMap .territory').length;
+    const unlocked = document.querySelectorAll('#fullMap .territory.unlocked').length;
+    const bar = document.getElementById('mapBar');
+    if (bar) bar.style.width = Math.round((unlocked / total) * 100) + '%';
+  }
+  // Map piece token grid
+  const mpg = document.getElementById('mpGrid');
+  if (mpg) {
+    const labels = ['Reading','Maths','Writing','Topic','Discovery','Volcano','Island','Safari'];
+    const icons = ['🏞️','⛰️','💧','🌴','🌋','🏝️','🦁','🧭'];
+    for (let i = 0; i < 24; i++) {
+      const t = document.createElement('div');
+      t.className = 'mp-token';
+      t.innerHTML = `<div class="mt-icon">${icons[i % icons.length]}</div><div class="mt-label">${labels[i % labels.length]}</div>`;
+      t.onclick = function() { this.classList.toggle('earned'); }
+      mpg.appendChild(t);
+    }
+  }
+  updateMapBar();
+</script>
+</body>
+</html>
